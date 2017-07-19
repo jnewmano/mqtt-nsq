@@ -1,0 +1,4 @@
+/apps/mqtt-to-nsq/mqtt-to-nsq
+/apps/nsq-to-mqtt/nsq-to-mqtt
+/client
+/server
