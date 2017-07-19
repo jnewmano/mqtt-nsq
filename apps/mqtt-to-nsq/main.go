@@ -4,11 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"net"
 	"os"
 	"time"
 
 	"github.com/jnewmano/mqtt-nsq/mqttclient"
+	"github.com/namsral/flag"
 )
 
 // generate a certificate CSR
@@ -16,56 +16,61 @@ import (
 
 func main() {
 
-	// MQTT address
-	// MQTT username
-	// MQTT password
-	// MQTT topic
+	var s Settings
+	flag.String(flag.DefaultConfigFlagname, "", "path to config file")
 
-	mqttAddress := net.JoinHostPort("test.mosquitto.org", mqttclient.DefaultClientTLSPort)
-	mqttUsername := ""
-	mqttPassword := []byte("")
-	mqttClientID := "someone"
-	mqttKeepAlive := time.Second * 25
-	mqttSubscribeTopic := "#"
+	flag.StringVar(&s.MQTT.Address, "mqtt-address", "", "MQTT server address:port")
+	flag.StringVar(&s.MQTT.Username, "mqtt-username", "", "MQTT username")
+	flag.StringVar(&s.MQTT.Password, "mqtt-password", "", "MQTT password")
+	flag.StringVar(&s.MQTT.ClientID, "mqtt-client-id", "", "MQTT client id")
+	flag.DurationVar(&s.MQTT.KeepAlive, "mqtt-keep-alive", 0, "MQTT keep alive")
+	flag.Var(&s.MQTT.Topics, "mqtt-topics", "MQTT topics, allows repeated")
 
-	clientCertificate, err := tls.LoadX509KeyPair("client.crt", "client.key")
-	if err != nil {
-		fmt.Printf("invalid client certificate, not going to use [%s]\n", err)
-	}
+	flag.StringVar(&s.MQTT.ClientCertificate, "mqtt-client-crt", "", "MQTT client certificate")
+	flag.StringVar(&s.MQTT.ClientKey, "mqtt-client-key", "", "MQTT client certificate key")
 
-	// NSQd address
-	// NSQd topic
-	// NSQd wrap payload
-	nsqdAddress := "localhost:4150"
-	nsqdTopic := "mqtt#ephemeral"
-	nsqdWrapPayload := true
+	flag.StringVar(&s.NSQ.Address, "nsqd-address", "", "NSQd TCP address:port")
+	flag.StringVar(&s.NSQ.Topic, "nsqd-topic", "", "NSQd publish topic")
+	flag.BoolVar(&s.NSQ.WrapPayload, "nsqd-wrap-payload", true, "Wrap payloads in procol buffer")
+
+	flag.Parse()
 
 	ctx := context.Background()
 
-	c, err := mqttclient.New(mqttAddress, mqttUsername, mqttPassword)
+	fmt.Printf("Connecting to MQTT [%s]\n", s.MQTT.Address)
+	c, err := mqttclient.New(s.MQTT.Address, s.MQTT.Username, []byte(s.MQTT.Password))
 	if err != nil {
 		exit(err)
 	}
 
-	c.SetClientID(mqttClientID)
-	c.SetKeepAlive(mqttKeepAlive)
-	c.Topics = []string{mqttSubscribeTopic}
+	c.SetClientID(s.MQTT.ClientID)
+	c.SetKeepAlive(time.Duration(s.MQTT.KeepAlive))
 
-	p, err := newNSQProducer(nsqdAddress, nsqdTopic, nsqdWrapPayload)
+	fmt.Printf("Subscribing to topics %v\n", s.MQTT.Topics)
+	c.Topics = s.MQTT.Topics
+
+	fmt.Printf("Connecting to NSQd [%s]\n", s.NSQ.Address)
+	p, err := newNSQProducer(s.NSQ.Address, s.NSQ.Topic, s.NSQ.WrapPayload)
 	if err != nil {
 		exit(err)
 	}
 
 	c.SetPublishHandler(p)
 	c.SkipTLSVerify(true)
-	c.SetClientTLSCertificate(clientCertificate)
+
+	if s.MQTT.ClientCertificate != "" && s.MQTT.ClientKey != "" {
+		fmt.Println("loading client certificate and key")
+		clientCertificate, err := tls.LoadX509KeyPair(s.MQTT.ClientCertificate, s.MQTT.ClientKey)
+		if err != nil {
+			fmt.Printf("invalid client certificate, not going to use [%s]\n", err)
+		}
+		c.SetClientTLSCertificate(clientCertificate)
+	}
 
 	err = c.Connect(ctx)
 	if err != nil {
 		exit(err)
 	}
-
-	ignoreError()
 
 	fmt.Println("waiting for messages")
 	select {}
@@ -75,8 +80,4 @@ func exit(err error) {
 	fmt.Println(err)
 	time.Sleep(time.Second * 2)
 	os.Exit(1)
-}
-
-func ignoreError() error {
-	return fmt.Errorf("error")
 }
