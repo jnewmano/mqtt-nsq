@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package nsqexporter;
+
+import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
+
+message MQTTMessage {
+
+	// message data
+	google.protobuf.Timestamp Timestamp = 1;
+	string Topic = 2;
+	bytes Payload = 3;
+
+	// meta data
+	string SourceAddress = 5;
+	uint32 PacketID = 6;
+
+}
