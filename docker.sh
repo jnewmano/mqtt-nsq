@@ -11,6 +11,8 @@ if [ $BRANCH != "master" ]; then
   TAG="${BRANCH}-${TAG}"
 fi
 
+git tag ${TAG}
+git push origin ${TAG}
 
 GOOS=linux
 
