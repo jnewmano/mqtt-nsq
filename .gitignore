@@ -2,3 +2,8 @@
 /apps/nsq-to-mqtt/nsq-to-mqtt
 /client
 /server
+/bin
+
+*.key
+*.crt
+*.csr

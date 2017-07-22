@@ -113,7 +113,7 @@ func writeVarint(w io.Writer, l int) error {
 		return err
 	}
 	if nn != n {
-		fmt.Errorf("unable to write all bytes")
+		return fmt.Errorf("unable to write all bytes")
 	}
 
 	return nil

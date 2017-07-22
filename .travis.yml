@@ -1,0 +1,18 @@
+sudo: required
+
+language: go
+
+matrix:
+  include:
+    - go: 1.8
+
+services:
+  - docker
+
+script:
+  - go test -cover -race ./...
+  - go vet ./...
+  - go build -v ./apps/...
+
+notifications:
+  email: false
