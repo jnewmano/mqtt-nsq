@@ -26,7 +26,6 @@ func (m *MQTTClient) keepAliveLoop(ctx context.Context) {
 		}
 	}
 
-	return
 }
 
 func (m *MQTTClient) Ping(ctx context.Context) error {

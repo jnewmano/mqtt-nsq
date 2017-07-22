@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/jnewmano/mqtt-nsq/mqttclient"
@@ -71,9 +73,20 @@ func main() {
 		exit(err)
 	}
 
-	select {} // TODO: handle SIGTERM
+	wait()
 
 	p.Stop()
+}
+
+func wait() {
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case <-c:
+	}
+
 }
 
 func exit(err error) {

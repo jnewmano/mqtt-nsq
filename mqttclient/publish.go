@@ -43,5 +43,4 @@ func (m *MQTTClient) handlePublish(p mqtt.Publish) error {
 
 	return nil
 
-	return nil
 }

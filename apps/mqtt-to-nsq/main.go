@@ -74,6 +74,7 @@ func main() {
 
 	fmt.Println("waiting for messages")
 	select {}
+
 }
 
 func exit(err error) {

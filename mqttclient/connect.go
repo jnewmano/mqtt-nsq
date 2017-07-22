@@ -43,7 +43,7 @@ func (m *MQTTClient) Connect(ctx context.Context) error {
 	case DefaultWSSPort:
 		err = m.ConnectWSS(ctx)
 	default:
-		return fmt.Errorf("unrecognized port [%s], connect using ConnectSSS")
+		return fmt.Errorf("unrecognized port [%s], connect using ConnectXXX", port)
 	}
 	if err != nil {
 		return err
@@ -167,7 +167,7 @@ func (m *MQTTClient) connect(ctx context.Context, conn net.Conn) error {
 	for _, v := range m.Topics {
 		err := subscribe.AddTopic(v, 1)
 		if err != nil {
-			fmt.Errorf("unable to generate subscribe: %s", err)
+			return fmt.Errorf("unable to generate subscribe: %s", err)
 		}
 	}
 
@@ -263,7 +263,6 @@ func (m *MQTTClient) readLoop(ctx context.Context, c net.Conn) error {
 		}
 	}
 
-	return nil
 }
 
 func (m *MQTTClient) writeLoop(ctx context.Context, c net.Conn) error {
