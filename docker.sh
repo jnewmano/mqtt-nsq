@@ -5,7 +5,7 @@ set -e
 REPO=jnewmano/mqtt-nsq
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-TAG=v6.0.$(git rev-list HEAD --count)
+TAG=v0.0.$(git rev-list HEAD --count)
 
 if [ $BRANCH != "master" ]; then
   TAG="${BRANCH}-${TAG}"
