@@ -2,11 +2,11 @@ language: go
 
 matrix:
   include:
-    - go: 1.9
+    - go: 1.8
 
 script:
   - go test -cover -race ./...
-  - go vet ./...
+  # - go vet ./... # enable when go1.9 is released 
   - go build -v ./apps/...
 
 notifications:
