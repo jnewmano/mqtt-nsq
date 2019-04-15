@@ -69,7 +69,7 @@ func (s *Subscribe) Send(w io.Writer) (uint16, error) {
 
 	// write out the requested topic subscriptions
 	for _, v := range s.Topics {
-		fmt.Println("subscribing to topic:", v)
+		fmt.Printf("subscribing to topic %s QOS %d\n", v.Topic, v.QOS)
 
 		err = writeString(b, v.Topic)
 		if err != nil {
