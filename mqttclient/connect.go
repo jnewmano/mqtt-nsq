@@ -12,6 +12,8 @@ import (
 	"github.com/jnewmano/mqtt-nsq/mqtt"
 )
 
+const DefaultQOS = 0
+
 /*
 Common MQTT ports
 */
@@ -165,7 +167,7 @@ func (m *MQTTClient) connect(ctx context.Context, conn net.Conn) error {
 	subscribe := mqtt.Subscribe{}
 
 	for _, v := range m.Topics {
-		err := subscribe.AddTopic(v, 1)
+		err := subscribe.AddTopic(v, DefaultQOS)
 		if err != nil {
 			return fmt.Errorf("unable to generate subscribe: %s", err)
 		}
