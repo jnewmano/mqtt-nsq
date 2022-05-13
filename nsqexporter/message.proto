@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package nsqexporter;
 
-import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/jnewmano/mqtt-nsq/nsqexporter;nsqexporter";
 
 message MQTTMessage {
 

@@ -1,6 +1,5 @@
 package nsqexporter
 
-//go:generate protoc -I=./ -I=$GOPATH/src --go_out=./ ./message.proto
 /*
 type Handler interface {
 	HandleMessage(message *nsq.Message) error
