@@ -1,5 +1,8 @@
 # mqtt-nsq
-MQTT to NSQ bridge
+
+MQTT client library in Go, not all features are implemented.
+
+Provides an MQTT to NSQ bridge
 
 Copy MQTT publish payloads to NSQ.
 
